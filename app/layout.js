@@ -2,36 +2,43 @@ import './global.css';
 import Script from "next/script";
 import ClientProviders from '../components/ClientProviders';
 
+// ✅ Global metadata (fallback for homepage + SEO)
 export const metadata = {
   title: 'CampusMart',
   description: 'Your campus marketplace',
+  openGraph: {
+    title: 'CampusMart',
+    description: 'Your campus marketplace',
+    url: 'https://yourdomain.com',
+    siteName: 'CampusMart',
+    images: [
+      {
+        url: 'https://yourdomain.com/fav.jpg', // MUST be absolute
+        width: 800,
+        height: 600,
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CampusMart',
+    description: 'Your campus marketplace',
+    images: ['https://yourdomain.com/fav.jpg'],
+  },
   icons: {
     icon: '/fav.jpg',
     shortcut: '/fav.jpg',
     apple: '/fav.jpg',
-    other: [
-      { rel: 'icon', url: '/fav.jpg', sizes: '32x32', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '64x64', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '96x96', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '128x128', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '192x192', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '256x256', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '384x384', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '512x512', type: 'image/jpeg' },
-      { rel: 'icon', url: '/fav.jpg', sizes: '1024x1024', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '180x180', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '152x152', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '167x167', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '192x192', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '256x256', type: 'image/jpeg' },
-      { rel: 'apple-touch-icon', url: '/fav.jpg', sizes: '512x512', type: 'image/jpeg' }
-    ]
-  }
+  },
 };
 
+// ✅ Fix hydration bug properly
+function HiddenTimestamp() {
+  return null; // simplest safe fix (no mismatch at all)
+}
+
 export default function RootLayout({ children }) {
-  // BUG: Hydration Mismatch - Date.now() differs on server/client
-  // We intentionally suppress the warning for the specific hydration mismatch to make it "subtle" but keeping the error logic
   return (
     <html lang="en">
       <head>
@@ -47,9 +54,9 @@ export default function RootLayout({ children }) {
         <ClientProviders>
           {children}
         </ClientProviders>
-        <div style={{ display: 'none' }}>
-           Timestamp: {typeof window !== 'undefined' ? Date.now() : 'Server Time'} 
-        </div>
+
+        {/* ✅ No hydration mismatch anymore */}
+        <HiddenTimestamp />
       </body>
     </html>
   );
